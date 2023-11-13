@@ -3,12 +3,16 @@ package com.pjestudos.pjfood.api.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
+import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
 import com.pjestudos.pjfood.api.domain.exception.CozinhaNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.NegocioException;
+import com.pjestudos.pjfood.api.domain.model.Cozinha;
 import com.pjestudos.pjfood.api.domain.model.Restaurante;
 import com.pjestudos.pjfood.api.domain.repository.RestauranteRepository;
 import com.pjestudos.pjfood.api.domain.service.CadastroRestauranteService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,7 @@ import javax.validation.Valid;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -33,47 +38,44 @@ public class RestauranteController {
     @Autowired
     private CadastroRestauranteService cadastroRestauranteService;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @GetMapping
-    public List<Restaurante> listar(){
-        return restauranteRepository.findAll();
+    public List<RestauranteDto> listar(){
+        return toCollectionDto(restauranteRepository.findAll());
     }
 
     @GetMapping("/{restaurantesId}")
-    public Restaurante buscar(@PathVariable("restaurantesId") Long id){
-        return cadastroRestauranteService.buscarOuTratar(id);
+    public RestauranteDto buscar(@PathVariable("restaurantesId") Long id){
+        Restaurante restaurante = cadastroRestauranteService.buscarOuTratar(id);
+        return toDto(restaurante);
 
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurante adicionar(@RequestBody @Valid Restaurante restaurante){
+    public RestauranteDto adicionar(@RequestBody @Valid RestauranteDto restauranteDto){
         try{
-            return cadastroRestauranteService.salvar(restaurante);
+            Restaurante restaurante = new Restaurante(restauranteDto);
+            return toDto(cadastroRestauranteService.salvar(restaurante));
         }catch (CozinhaNaoEncontradaException e ){
             throw new NegocioException(e.getMessage(), e);
         }
     }
 
     @PutMapping("/{restaurantesId}")
-    public Restaurante atualizar(@PathVariable("restaurantesId") Long id,
-                                                 @RequestBody Restaurante restaurante) {
+    public RestauranteDto atualizar(@PathVariable("restaurantesId") Long id,
+                                                @Valid @RequestBody RestauranteDto restauranteDto) {
                 try{
                     Restaurante restauranteAtual = cadastroRestauranteService.buscarOuTratar(id);
-                    BeanUtils.copyProperties(restaurante, restauranteAtual, "id","formaDePagamentos",
-                            "endereco", "dataCadastro");
-                    return cadastroRestauranteService.salvar(restauranteAtual);
+                   copyToDomainObject(restauranteDto, restauranteAtual);
+                    return toDto(cadastroRestauranteService.salvar(restauranteAtual));
                 }catch (CozinhaNaoEncontradaException e){
                     throw new NegocioException(e.getMessage(), e);
                 }
     }
 
-    @PatchMapping("/{restaurantesId}")
-    public Restaurante atualizarParcial(@PathVariable("restaurantesId") Long id,
-                                        @RequestBody Map<String, Object> campos, HttpServletRequest request){
-        Restaurante restauranteAtual = cadastroRestauranteService.buscarOuTratar(id);
-        merge(campos, restauranteAtual, request);
-        return atualizar(id, restauranteAtual);
-    }
 
     // esse metodo serve pra mesclar as propriedades com as atuais
     private void merge(Map<String, Object> dadosOrigem, Restaurante restauranteDestino, HttpServletRequest request) {
@@ -105,4 +107,17 @@ public class RestauranteController {
         cadastroRestauranteService.excluir(id);
     }
 
+    private RestauranteDto toDto(Restaurante restaurante){
+        return modelMapper.map(restaurante, RestauranteDto.class);
+    }
+
+    private List<RestauranteDto> toCollectionDto(List<Restaurante>restaurantes){
+        return restaurantes.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    private void copyToDomainObject(RestauranteDto restauranteDto, Restaurante restaurante){
+        //Para evitar expetion identifier of an istance of.Cozinha as altered from 1 to 2
+        restaurante.setCozinha(new Cozinha());
+        modelMapper.map(restauranteDto, restaurante);
+    }
 }

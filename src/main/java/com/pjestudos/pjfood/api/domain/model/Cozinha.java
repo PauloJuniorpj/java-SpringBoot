@@ -1,6 +1,8 @@
 package com.pjestudos.pjfood.api.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
+import com.pjestudos.pjfood.core.validation.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,18 +17,26 @@ import java.util.List;
 //Aggregate Root
 public class Cozinha {
 
-    @NotNull
+    @NotNull(groups = Groups.CozinhaId.class)
     @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
-    @JsonIgnore
     @OneToMany(mappedBy = "cozinha")
     private List<Restaurante> restaurantes = new ArrayList<>();
 
+    public Cozinha(CozinhaDto cozinhaDto) {
+        id = cozinhaDto.getId();
+        nome = cozinhaDto.getNome();
+    }
+
+
+    public Cozinha() {
+
+    }
 }

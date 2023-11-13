@@ -1,6 +1,8 @@
 package com.pjestudos.pjfood.api.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
+import com.pjestudos.pjfood.core.validation.Groups;
+import com.pjestudos.pjfood.core.validation.TaxaFrete;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,6 +11,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,34 +29,32 @@ public class Restaurante {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty
-    @NotBlank
-    private String nome;
-
-    @JsonIgnore
     @NotNull
+    @ConvertGroup(from = Default.class, to = Groups.CozinhaId.class)
     @Valid
     @ManyToOne //(fetch = FetchType.LAZY)
     //tudo que termina com ToOne vai ser Eager Loading trazendo os carregamentos juntos
     @JoinColumn(name = "cozinha_id", nullable = false)
     private Cozinha cozinha;
 
-    @PositiveOrZero
+    @NotBlank
+    @Column(nullable = false)
+    private String nome;
+
+    @NotNull // adicionei porque o @PositiveOrZero não valida se é nulo
+    @TaxaFrete
     @Column(name = "taxa_frete", nullable = false)
     private BigDecimal taxaFrete;
 
-    @JsonIgnore
     @CreationTimestamp//atribui a data e a hora atual uma vez que a entidade foi cadastrada uma unica vezs
     @Column(name ="data_cadastro", nullable = false)
     private LocalDateTime dataCadastro;
 
-    @JsonIgnore
     @UpdateTimestamp//informa que a data e hora atual deve ser atribuida a
     // propriedade sempre que sofre uma atualização
     @Column(name = "data_atualizacao", nullable = false)
     private LocalDateTime dataAtualização;
 
-    @JsonIgnore
     @ManyToMany// nao usar os FetchType.Eager nos ManyToMany nao e performatico...
     // tudo que termina com Many e Lazy loading ou seja um carregamento por demanda
     @JoinTable(name = "restaurante_forma_pagamento",
@@ -60,11 +62,15 @@ public class Restaurante {
             inverseJoinColumns = @JoinColumn(name = "forma_pagamento_id"))
     private List<FormaDePagamento> formasPagamento = new ArrayList<>();
 
-    @JsonIgnore
     @Embedded
     private Endereco endereco;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "restaurante")
     private List<Produto> produtos = new ArrayList<>();
+
+    public Restaurante(RestauranteDto restauranteDto) {
+        this.id = restauranteDto.getId();
+        this.cozinha.setId(restauranteDto.getCozinha().getId());
+        this.taxaFrete = restauranteDto.getTaxaFrete();
+    }
 }

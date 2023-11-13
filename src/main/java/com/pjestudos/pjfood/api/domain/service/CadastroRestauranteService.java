@@ -1,5 +1,6 @@
 package com.pjestudos.pjfood.api.domain.service;
 
+import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
 import com.pjestudos.pjfood.api.domain.exception.RestauranteNaoEncontradoException;
 import com.pjestudos.pjfood.api.domain.repository.CozinhaRepository;
 import com.pjestudos.pjfood.api.domain.repository.RestauranteRepository;
@@ -9,6 +10,7 @@ import com.pjestudos.pjfood.api.domain.model.Restaurante;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroRestauranteService {
@@ -21,12 +23,15 @@ public class CadastroRestauranteService {
     private CozinhaRepository cozinhaRepository;
     private CadastroCozinhaService cadastroCozinhaService;
 
-    public CadastroRestauranteService(RestauranteRepository restauranteRepository, CozinhaRepository cozinhaRepository, CadastroCozinhaService cadastroCozinhaService) {
+    public CadastroRestauranteService(RestauranteRepository restauranteRepository,
+                                      CozinhaRepository cozinhaRepository,
+                                      CadastroCozinhaService cadastroCozinhaService) {
         this.restauranteRepository = restauranteRepository;
         this.cozinhaRepository = cozinhaRepository;
         this.cadastroCozinhaService = cadastroCozinhaService;
     }
 
+    @Transactional
     public Restaurante salvar(Restaurante restaurante){
         Long cozinhaId = restaurante.getCozinha().getId();
         Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
@@ -39,6 +44,7 @@ public class CadastroRestauranteService {
                 .orElseThrow(() -> new RestauranteNaoEncontradoException(String.format(MSG_NAO_EXISTE_CADASTRO_COM_ESTE_CODIGO)));
     }
 
+    @Transactional
     public void excluir(Long restauranteId) {
         try {
             restauranteRepository.deleteById(restauranteId);
