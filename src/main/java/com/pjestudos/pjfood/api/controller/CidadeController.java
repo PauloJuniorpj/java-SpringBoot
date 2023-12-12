@@ -2,24 +2,17 @@ package com.pjestudos.pjfood.api.controller;
 
 
 import com.pjestudos.pjfood.api.domain.dto.Cidade.CidadeDto;
-import com.pjestudos.pjfood.api.domain.dto.Estado.EstadoDto;
-import com.pjestudos.pjfood.api.domain.exception.exceptionhandler.Problema;
-import com.pjestudos.pjfood.api.domain.exception.EntidadeNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.EstadoNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.NegocioException;
 import com.pjestudos.pjfood.api.domain.model.Cidade;
-import com.pjestudos.pjfood.api.domain.model.Estado;
 import com.pjestudos.pjfood.api.domain.repository.CidadeRepository;
 import com.pjestudos.pjfood.api.domain.service.CadastroCidadeService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +28,7 @@ public class CidadeController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Operation(summary = "Listar", description = "Retorna todas as cozinhas")
     @GetMapping
     public List<CidadeDto> listar(){
         return toCollectionDto(cidadeRepository.findAll());

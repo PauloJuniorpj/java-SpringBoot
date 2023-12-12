@@ -149,8 +149,7 @@ public class ExceptionHandlerGlobal extends ResponseEntityExceptionHandler {
         return Problema.builder()
                 .status(httpStatus.value())
                 .type(problemaTipo.getPath())
-                .timesTamp(LocalDateTime.parse(LocalDateTime.now()
-                        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                .timesTamp(LocalDateTime.now())
                 .detail(detail);
     }
 

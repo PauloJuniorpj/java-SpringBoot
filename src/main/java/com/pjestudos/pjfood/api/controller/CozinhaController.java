@@ -1,13 +1,10 @@
 package com.pjestudos.pjfood.api.controller;
 
 import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
-import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
 import com.pjestudos.pjfood.api.domain.model.Cozinha;
-import com.pjestudos.pjfood.api.domain.model.Restaurante;
 import com.pjestudos.pjfood.api.domain.repository.CozinhaRepository;
 import com.pjestudos.pjfood.api.domain.service.CadastroCozinhaService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
