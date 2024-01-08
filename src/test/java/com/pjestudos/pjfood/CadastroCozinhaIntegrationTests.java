@@ -3,7 +3,7 @@ package com.pjestudos.pjfood;
 import com.pjestudos.pjfood.api.domain.exception.CozinhaNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.EntidadeEmUsoException;
 import com.pjestudos.pjfood.api.domain.model.Cozinha;
-import com.pjestudos.pjfood.api.domain.service.CadastroCozinhaService;
+import com.pjestudos.pjfood.api.domain.service.CozinhaService;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CadastroCozinhaIntegrationTests {
 
 	@Autowired
-	private CadastroCozinhaService cadastroCozinhaService;
+	private CozinhaService cozinhaService;
 
 	// Caminho Feliz
 	@Test
@@ -29,7 +29,7 @@ public class CadastroCozinhaIntegrationTests {
 		Cozinha novaCozinha = new Cozinha();
 		novaCozinha.setNome("Chinesa");
 		//ação que a gente espera
-		cadastroCozinhaService.salvar(novaCozinha);
+		cozinhaService.salvar(novaCozinha);
 		// e a validação do nosso teste
 		assertThat(novaCozinha).isNotNull();
 		assertThat(novaCozinha.getId()).isNotNull();
@@ -43,7 +43,7 @@ public class CadastroCozinhaIntegrationTests {
 
 		DataIntegrityViolationException erroEsperado =
 				Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-					cadastroCozinhaService.salvar(novaCozinha);
+					cozinhaService.salvar(novaCozinha);
 				});
 
 		assertThat(erroEsperado).isNotNull();
@@ -54,17 +54,17 @@ public class CadastroCozinhaIntegrationTests {
 		Cozinha novaCozinha = new Cozinha();
 		novaCozinha.setNome(null);
 
-		novaCozinha = cadastroCozinhaService.salvar(novaCozinha);
+		novaCozinha = cozinhaService.salvar(novaCozinha);
 	}
 
 	//Caminhos infelizes
 	@Test(expected = EntidadeEmUsoException.class)
 	public void deveFalharQuandoExcluirCozinhaEmUso(){
-		cadastroCozinhaService.excluir(1L);
+		cozinhaService.excluir(1L);
 	}
 
 	@Test(expected = CozinhaNaoEncontradaException.class)
 	public void deveFalharQuandoExcluirCozinhaInexistente() {
-		cadastroCozinhaService.excluir(100L);
+		cozinhaService.excluir(100L);
 	}
 }

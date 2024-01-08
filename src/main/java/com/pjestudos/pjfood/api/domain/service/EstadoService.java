@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CadastroEstadoService {
+public class EstadoService {
 
     public static final String MSG_ESTADO_EM_USO = "Estado de código %d não pode " +
             "ser removida, pois está em uso";

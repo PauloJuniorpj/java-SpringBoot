@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CadastroCidadeService {
+public class CidadeService {
 
-    private CadastroEstadoService cadastroEstadoService;
+    private EstadoService estadoService;
 
-    public CadastroCidadeService(CadastroEstadoService cadastroEstadoService) {
-        this.cadastroEstadoService = cadastroEstadoService;
+    public CidadeService(EstadoService estadoService) {
+        this.estadoService = estadoService;
     }
 
     public static final String MSG_CIDADE_NAO_ENCONTRADO = "Não existe cadastro de " +
@@ -35,7 +35,7 @@ public class CadastroCidadeService {
     @Transactional
     public Cidade salvar(Cidade cidade) {
         Long estadoId = cidade.getEstado().getId();
-        Estado estado = cadastroEstadoService.buscarOuExceptionTratada(estadoId);
+        Estado estado = estadoService.buscarOuExceptionTratada(estadoId);
         cidade.setEstado(estado);
         return cidadeRepository.save(cidade);
     }

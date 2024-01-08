@@ -6,7 +6,7 @@ import com.pjestudos.pjfood.api.domain.exception.EstadoNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.NegocioException;
 import com.pjestudos.pjfood.api.domain.model.Cidade;
 import com.pjestudos.pjfood.api.domain.repository.CidadeRepository;
-import com.pjestudos.pjfood.api.domain.service.CadastroCidadeService;
+import com.pjestudos.pjfood.api.domain.service.CidadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class CidadeController {
     @Autowired
     private CidadeRepository cidadeRepository;
     @Autowired
-    private CadastroCidadeService cadastroCidadeService;
+    private CidadeService cidadeService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -36,7 +36,7 @@ public class CidadeController {
 
     @GetMapping("/{cidadeId}")
     public CidadeDto buscar(@PathVariable Long cidadeId) {
-        return toDto(cadastroCidadeService.buscarOuExceptionTratada(cidadeId));
+        return toDto(cidadeService.buscarOuExceptionTratada(cidadeId));
     }
 
     @PostMapping
@@ -44,7 +44,7 @@ public class CidadeController {
     public CidadeDto adicionar(@RequestBody  CidadeDto cidadeDto) {
         try {
             Cidade cidade = new Cidade(cidadeDto);
-            return toDto(cadastroCidadeService.salvar(cidade));
+            return toDto(cidadeService.salvar(cidade));
         } catch (EstadoNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
         }
@@ -54,10 +54,10 @@ public class CidadeController {
     public CidadeDto atualizar(@PathVariable  Long cidadeId,
                             @RequestBody CidadeDto cidade) {
         try {
-            Cidade cidadeAtual = cadastroCidadeService.buscarOuExceptionTratada(cidadeId);
+            Cidade cidadeAtual = cidadeService.buscarOuExceptionTratada(cidadeId);
             copyToDomainObject(cidade, cidadeAtual);
 
-            return toDto(cadastroCidadeService.salvar(cidadeAtual));
+            return toDto(cidadeService.salvar(cidadeAtual));
         } catch (EstadoNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
         }
@@ -66,7 +66,7 @@ public class CidadeController {
     @DeleteMapping("/{cidadeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long cidadeId) {
-        cadastroCidadeService.excluir(cidadeId);
+        cidadeService.excluir(cidadeId);
     }
 
     private CidadeDto toDto(Cidade cidade){

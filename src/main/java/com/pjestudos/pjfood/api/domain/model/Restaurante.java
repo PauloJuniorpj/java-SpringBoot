@@ -3,8 +3,10 @@ package com.pjestudos.pjfood.api.domain.model;
 import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
 import com.pjestudos.pjfood.core.validation.Groups;
 import com.pjestudos.pjfood.core.validation.TaxaFrete;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -21,6 +23,8 @@ import java.util.List;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 //Aggregate Root
 public class Restaurante {
 
@@ -40,6 +44,8 @@ public class Restaurante {
     @NotBlank
     @Column(nullable = false)
     private String nome;
+
+    private Boolean ativo = Boolean.TRUE;
 
     @NotNull // adicionei porque o @PositiveOrZero não valida se é nulo
     @TaxaFrete
@@ -72,5 +78,12 @@ public class Restaurante {
         this.id = restauranteDto.getId();
         this.cozinha.setId(restauranteDto.getCozinha().getId());
         this.taxaFrete = restauranteDto.getTaxaFrete();
+    }
+
+    public  void ativar (){
+        setAtivo(true);
+    }
+    public  void inativar (){
+        setAtivo(false);
     }
 }

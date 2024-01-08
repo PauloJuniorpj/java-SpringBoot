@@ -1,7 +1,9 @@
 package com.pjestudos.pjfood.api.domain.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -10,6 +12,8 @@ import javax.persistence.*;
 @Data
 //Aggregate Root
 @Table(name = "permissao")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Permissao {
 
     @EqualsAndHashCode.Include

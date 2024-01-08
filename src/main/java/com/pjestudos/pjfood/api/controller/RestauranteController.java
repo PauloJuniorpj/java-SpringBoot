@@ -3,17 +3,15 @@ package com.pjestudos.pjfood.api.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
 import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
 import com.pjestudos.pjfood.api.domain.exception.CozinhaNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.NegocioException;
 import com.pjestudos.pjfood.api.domain.model.Cozinha;
 import com.pjestudos.pjfood.api.domain.model.Restaurante;
 import com.pjestudos.pjfood.api.domain.repository.RestauranteRepository;
-import com.pjestudos.pjfood.api.domain.service.CadastroRestauranteService;
+import com.pjestudos.pjfood.api.domain.service.RestauranteService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -36,7 +34,7 @@ public class RestauranteController {
     private RestauranteRepository restauranteRepository;
 
     @Autowired
-    private CadastroRestauranteService cadastroRestauranteService;
+    private RestauranteService restauranteService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -48,7 +46,7 @@ public class RestauranteController {
 
     @GetMapping("/{restaurantesId}")
     public RestauranteDto buscar(@PathVariable("restaurantesId") Long id){
-        Restaurante restaurante = cadastroRestauranteService.buscarOuTratar(id);
+        Restaurante restaurante = restauranteService.buscarOuTratar(id);
         return toDto(restaurante);
 
     }
@@ -58,7 +56,7 @@ public class RestauranteController {
     public RestauranteDto adicionar(@RequestBody @Valid RestauranteDto restauranteDto){
         try{
             Restaurante restaurante = new Restaurante(restauranteDto);
-            return toDto(cadastroRestauranteService.salvar(restaurante));
+            return toDto(restauranteService.salvar(restaurante));
         }catch (CozinhaNaoEncontradaException e ){
             throw new NegocioException(e.getMessage(), e);
         }
@@ -68,9 +66,9 @@ public class RestauranteController {
     public RestauranteDto atualizar(@PathVariable("restaurantesId") Long id,
                                                 @Valid @RequestBody RestauranteDto restauranteDto) {
                 try{
-                    Restaurante restauranteAtual = cadastroRestauranteService.buscarOuTratar(id);
+                    Restaurante restauranteAtual = restauranteService.buscarOuTratar(id);
                    copyToDomainObject(restauranteDto, restauranteAtual);
-                    return toDto(cadastroRestauranteService.salvar(restauranteAtual));
+                    return toDto(restauranteService.salvar(restauranteAtual));
                 }catch (CozinhaNaoEncontradaException e){
                     throw new NegocioException(e.getMessage(), e);
                 }
@@ -104,7 +102,19 @@ public class RestauranteController {
     public void remover
             (@PathVariable("restaurantesId")Long id) {
 
-        cadastroRestauranteService.excluir(id);
+        restauranteService.excluir(id);
+    }
+
+    @PutMapping("/{id}/ativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ativar(@PathVariable Long id){
+        restauranteService.ativar(id);
+    }
+
+    @DeleteMapping("/{id}/inativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void inativar(@PathVariable Long id){
+        restauranteService.inativar(id);
     }
 
     private RestauranteDto toDto(Restaurante restaurante){

@@ -2,8 +2,10 @@ package com.pjestudos.pjfood.api.domain.model;
 
 import com.pjestudos.pjfood.api.domain.dto.Estado.EstadoDto;
 import com.pjestudos.pjfood.core.validation.Groups;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +14,8 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 //Aggregate Root
 public class Estado {
 
@@ -28,9 +32,5 @@ public class Estado {
     public Estado(EstadoDto estadoDto) {
         id = estadoDto.getId();
         nome = estadoDto.getNome();
-    }
-
-    public Estado() {
-
     }
 }

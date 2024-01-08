@@ -2,8 +2,10 @@ package com.pjestudos.pjfood.api.domain.model;
 
 import com.pjestudos.pjfood.api.domain.dto.Cidade.CidadeDto;
 import com.pjestudos.pjfood.core.validation.Groups;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -15,7 +17,8 @@ import javax.validation.groups.Default;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-//Aggregate Root
+@AllArgsConstructor
+@NoArgsConstructor
 public class Cidade {
 
     @EqualsAndHashCode.Include
@@ -37,9 +40,5 @@ public class Cidade {
     public Cidade(CidadeDto cidadeDto) {
         id = cidadeDto.getId();
         nome = cidadeDto.getNome();
-    }
-
-    public Cidade(){
-
     }
 }

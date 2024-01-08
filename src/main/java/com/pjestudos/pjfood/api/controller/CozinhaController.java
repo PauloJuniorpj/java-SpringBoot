@@ -3,7 +3,7 @@ package com.pjestudos.pjfood.api.controller;
 import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
 import com.pjestudos.pjfood.api.domain.model.Cozinha;
 import com.pjestudos.pjfood.api.domain.repository.CozinhaRepository;
-import com.pjestudos.pjfood.api.domain.service.CadastroCozinhaService;
+import com.pjestudos.pjfood.api.domain.service.CozinhaService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class CozinhaController {
 
     @Autowired
-    private CadastroCozinhaService cadastroCozinhaService;
+    private CozinhaService cozinhaService;
     @Autowired
     private CozinhaRepository cozinhaRepository;
 
@@ -35,7 +35,7 @@ public class CozinhaController {
     @GetMapping("/{cozinhasId}")
     public CozinhaDto buscar(@PathVariable("cozinhasId") Long id){
         // refatorando e deixando mais elegante
-        return toDto(cadastroCozinhaService.buscarOuFalhar(id));
+        return toDto(cozinhaService.buscarOuFalhar(id));
 
 
         /*Optional<Cozinha> cozinha =  cozinhaRepository.findById(id);
@@ -52,21 +52,21 @@ public class CozinhaController {
     @ResponseStatus(HttpStatus.CREATED)
     public CozinhaDto adicionar(@RequestBody  CozinhaDto cozinhaDto){
         Cozinha cozinha = new Cozinha(cozinhaDto);
-        return toDto(cadastroCozinhaService.salvar(cozinha));
+        return toDto(cozinhaService.salvar(cozinha));
     }
 
     @PutMapping("/{cozinhasId}")
     public CozinhaDto atualizar(@PathVariable("cozinhasId") Long id, @Valid @RequestBody CozinhaDto cozinhaDto){
-        Cozinha cozinhaatual = cadastroCozinhaService.buscarOuFalhar(id);
+        Cozinha cozinhaatual = cozinhaService.buscarOuFalhar(id);
             copyToDomainObject(cozinhaDto, cozinhaatual);
-            return toDto(cadastroCozinhaService.salvar(cozinhaatual));
+            return toDto(cozinhaService.salvar(cozinhaatual));
     }
 
     // foi usado a customização das classes de exception deixando mais elegante o codigo como pode ser visto em cima
     @DeleteMapping("/{cozinhasId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void  remover(@PathVariable("cozinhasId") Long id){
-            cadastroCozinhaService.excluir(id);
+            cozinhaService.excluir(id);
     }
 
     private CozinhaDto toDto(Cozinha cozinha){
