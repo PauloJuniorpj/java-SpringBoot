@@ -1,4 +1,4 @@
-package com.pjestudos.pjfood.config;
+package com.pjestudos.pjfood.config.Swagger;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

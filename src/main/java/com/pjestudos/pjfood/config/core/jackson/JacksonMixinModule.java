@@ -1,4 +1,4 @@
-package com.pjestudos.pjfood.core.jackson;
+package com.pjestudos.pjfood.config.core.jackson;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.stereotype.Component;

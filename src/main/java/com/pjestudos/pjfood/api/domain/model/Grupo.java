@@ -1,5 +1,6 @@
 package com.pjestudos.pjfood.api.domain.model;
 
+import com.pjestudos.pjfood.api.domain.dto.Grupo.GrupoDtoInput;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,4 +29,8 @@ public class Grupo {
     @JoinTable(name = "grupo_permissao", joinColumns = @JoinColumn(name = "grupo_id"),
     inverseJoinColumns = @JoinColumn(name = "permissao_id"))
     private List<Permissao> permissoes = new ArrayList<>();
+
+    public Grupo(GrupoDtoInput grupoDtoInput) {
+        nome = grupoDtoInput.getNome();
+    }
 }

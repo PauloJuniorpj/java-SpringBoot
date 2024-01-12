@@ -1,7 +1,7 @@
 package com.pjestudos.pjfood.api.domain.model;
 
 import com.pjestudos.pjfood.api.domain.dto.Estado.EstadoDto;
-import com.pjestudos.pjfood.core.validation.Groups;
+import com.pjestudos.pjfood.config.core.validation.Groups;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

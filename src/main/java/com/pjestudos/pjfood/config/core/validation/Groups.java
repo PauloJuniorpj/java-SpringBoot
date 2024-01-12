@@ -1,4 +1,4 @@
-package com.pjestudos.pjfood.core.validation;
+package com.pjestudos.pjfood.config.core.validation;
 
 public interface Groups {
     public interface CozinhaId{};

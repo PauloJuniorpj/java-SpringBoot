@@ -1,8 +1,7 @@
 package com.pjestudos.pjfood.api.domain.model;
 
-import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
-import com.pjestudos.pjfood.core.validation.Groups;
-import com.pjestudos.pjfood.core.validation.TaxaFrete;
+import com.pjestudos.pjfood.config.core.validation.Groups;
+import com.pjestudos.pjfood.config.core.validation.TaxaFrete;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +17,9 @@ import javax.validation.groups.Default;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -66,7 +67,7 @@ public class Restaurante {
     @JoinTable(name = "restaurante_forma_pagamento",
             joinColumns = @JoinColumn(name = "restaurante_id"),
             inverseJoinColumns = @JoinColumn(name = "forma_pagamento_id"))
-    private List<FormaDePagamento> formasPagamento = new ArrayList<>();
+    private Set<FormaDePagamento> formasPagamento = new HashSet<>();
 
     @Embedded
     private Endereco endereco;
@@ -74,16 +75,19 @@ public class Restaurante {
     @OneToMany(mappedBy = "restaurante")
     private List<Produto> produtos = new ArrayList<>();
 
-    public Restaurante(RestauranteDto restauranteDto) {
-        this.id = restauranteDto.getId();
-        this.cozinha.setId(restauranteDto.getCozinha().getId());
-        this.taxaFrete = restauranteDto.getTaxaFrete();
-    }
+
 
     public  void ativar (){
         setAtivo(true);
     }
     public  void inativar (){
         setAtivo(false);
+    }
+
+    public boolean removerFormaPagamento (FormaDePagamento formaDePagamento){
+        return getFormasPagamento().remove(formaDePagamento);
+    }
+    public boolean associarNovaFormaPagamento(FormaDePagamento formaDePagamento) {
+        return getFormasPagamento().add(formaDePagamento);
     }
 }

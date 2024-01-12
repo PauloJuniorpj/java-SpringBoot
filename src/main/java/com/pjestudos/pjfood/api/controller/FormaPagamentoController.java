@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public class FormaPagamentoController {
         return modelMapper.map(formaDePagamento, FormaPagamentoDto.class);
     }
 
-    private List<FormaPagamentoDto> toCollectionDto(List<FormaDePagamento>formaDePagamentos){
+    private List<FormaPagamentoDto> toCollectionDto(Collection<FormaDePagamento> formaDePagamentos){
         return formaDePagamentos.stream().map(this::toDto).collect(Collectors.toList());
     }
 

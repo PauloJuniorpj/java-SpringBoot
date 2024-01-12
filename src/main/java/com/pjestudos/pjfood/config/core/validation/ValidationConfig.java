@@ -1,4 +1,4 @@
-package com.pjestudos.pjfood.core.validation;
+package com.pjestudos.pjfood.config.core.validation;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

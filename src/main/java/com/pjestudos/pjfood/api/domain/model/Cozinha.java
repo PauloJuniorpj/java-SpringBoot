@@ -1,8 +1,7 @@
 package com.pjestudos.pjfood.api.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
-import com.pjestudos.pjfood.core.validation.Groups;
+import com.pjestudos.pjfood.config.core.validation.Groups;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

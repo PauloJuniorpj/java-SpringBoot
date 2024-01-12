@@ -2,9 +2,11 @@ package com.pjestudos.pjfood.api.controller;
 
 
 import com.pjestudos.pjfood.api.domain.dto.Cidade.CidadeDto;
+import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDto;
 import com.pjestudos.pjfood.api.domain.exception.EstadoNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.NegocioException;
 import com.pjestudos.pjfood.api.domain.model.Cidade;
+import com.pjestudos.pjfood.api.domain.model.Restaurante;
 import com.pjestudos.pjfood.api.domain.repository.CidadeRepository;
 import com.pjestudos.pjfood.api.domain.service.CidadeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +45,7 @@ public class CidadeController {
     @ResponseStatus(HttpStatus.CREATED)
     public CidadeDto adicionar(@RequestBody  CidadeDto cidadeDto) {
         try {
-            Cidade cidade = new Cidade(cidadeDto);
+            Cidade cidade = toDomainObject(cidadeDto);
             return toDto(cidadeService.salvar(cidade));
         } catch (EstadoNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
@@ -69,6 +71,10 @@ public class CidadeController {
         cidadeService.excluir(cidadeId);
     }
 
+
+    private Cidade toDomainObject(CidadeDto cidadeDto){
+        return modelMapper.map(cidadeDto, Cidade.class);
+    }
     private CidadeDto toDto(Cidade cidade){
         return modelMapper.map(cidade, CidadeDto.class);
     }
