@@ -10,6 +10,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class RestauranteService {
 
@@ -22,17 +24,20 @@ public class RestauranteService {
     private CozinhaService cozinhaService;
     private CidadeService cidadeService;
     private FormaPagamentoService formaPagamentoService;
+    private UsuarioService usuarioService;
 
     public RestauranteService(RestauranteRepository restauranteRepository,
                               CozinhaRepository cozinhaRepository,
                               CozinhaService cozinhaService,
                               CidadeService cidadeService,
-                              FormaPagamentoService formaPagamentoService) {
+                              FormaPagamentoService formaPagamentoService,
+                              UsuarioService usuarioService) {
         this.restauranteRepository = restauranteRepository;
         this.cozinhaRepository = cozinhaRepository;
         this.cozinhaService = cozinhaService;
         this.cidadeService = cidadeService;
         this.formaPagamentoService = formaPagamentoService;
+        this.usuarioService = usuarioService;
     }
 
     @Transactional
@@ -76,6 +81,17 @@ public class RestauranteService {
         restauranteAtual.inativar();
     }
 
+    @Transactional
+    public void aberto(Long restauranteId){
+        Restaurante restaurante = buscarOuTratar(restauranteId);
+        restaurante.abertura();
+    }
+    @Transactional
+    public void fechamento(Long restauranteId){
+        Restaurante restaurante = buscarOuTratar(restauranteId);
+        restaurante.fechamento();
+    }
+
     //Vincular uma forma de pagamento de um restaurante especifico
     @Transactional
     public void associarFormaPagamento(Long restauranteId, Long formaPagamentoId){
@@ -93,6 +109,30 @@ public class RestauranteService {
         var formaDePagamento = formaPagamentoService.buscarOuFalhar(formaPagamentoId);
 
         restaurante.removerFormaPagamento(formaDePagamento);
+    }
+
+    @Transactional
+    public void desassociarResponsavel(Long restauranteId, Long usuarioId) {
+        var restaurante = buscarOuTratar(restauranteId);
+        var usuario = usuarioService.buscarOuFalhar(usuarioId);
+
+        restaurante.removerResponsavel(usuario);
+    }
+
+    @Transactional
+    public void associarResponsavel(Long restauranteId, Long usuarioId) {
+        var restaurante = buscarOuTratar(restauranteId);
+        var usuario = usuarioService.buscarOuFalhar(usuarioId);
+        restaurante.adicionarResponsavel(usuario);
+    }
+
+    @Transactional
+    public void ativarVarios(List<Long> restauranteIds){
+        restauranteIds.forEach(this::ativar);
+    }
+    @Transactional
+    public void inativarVarios(List<Long> restauranteIds){
+        restauranteIds.forEach(this::inativar);
     }
 
 }

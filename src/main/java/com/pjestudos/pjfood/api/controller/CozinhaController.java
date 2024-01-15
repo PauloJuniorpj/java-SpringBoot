@@ -4,6 +4,7 @@ import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
 import com.pjestudos.pjfood.api.domain.model.Cozinha;
 import com.pjestudos.pjfood.api.domain.repository.CozinhaRepository;
 import com.pjestudos.pjfood.api.domain.service.CozinhaService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,28 +27,19 @@ public class CozinhaController {
     @Autowired
     private ModelMapper modelMapper;
 
-
+    @Operation(summary = "Listar", description = "Listar todas as cozinhas")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CozinhaDto> listar(){
         return toCollectionDto(cozinhaRepository.findAll());
     }
 
+    @Operation(summary = "Buscar", description = "Buscar uma cozinha especifica")
     @GetMapping("/{cozinhasId}")
     public CozinhaDto buscar(@PathVariable("cozinhasId") Long id){
-        // refatorando e deixando mais elegante
         return toDto(cozinhaService.buscarOuFalhar(id));
-
-
-        /*Optional<Cozinha> cozinha =  cozinhaRepository.findById(id);
-        //return ResponseEntity.status(HttpStatus.OK).body(cozinha);
-        // jeito simplificado... de trazer um statuso 200 ok
-        if(cozinha.isPresent()){
-            return ResponseEntity.ok(cozinha.get());
-        }
-        return ResponseEntity.notFound().build();
-         */
     }
 
+    @Operation(summary = "Cadastrar", description = "Cadastrar nova cozinha")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CozinhaDto adicionar(@RequestBody  CozinhaDto cozinhaDto){
@@ -55,6 +47,7 @@ public class CozinhaController {
         return toDto(cozinhaService.salvar(cozinha));
     }
 
+    @Operation(summary = "Atualizar", description = "Atualizar uma cozinha cadastrada")
     @PutMapping("/{cozinhasId}")
     public CozinhaDto atualizar(@PathVariable("cozinhasId") Long id, @Valid @RequestBody CozinhaDto cozinhaDto){
         Cozinha cozinhaatual = cozinhaService.buscarOuFalhar(id);
@@ -62,6 +55,7 @@ public class CozinhaController {
             return toDto(cozinhaService.salvar(cozinhaatual));
     }
 
+    @Operation(summary = "Excluir", description = "Excluzao de uma cozinha cadastrada")
     // foi usado a customização das classes de exception deixando mais elegante o codigo como pode ser visto em cima
     @DeleteMapping("/{cozinhasId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

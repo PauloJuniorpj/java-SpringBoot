@@ -48,6 +48,8 @@ public class Restaurante {
 
     private Boolean ativo = Boolean.TRUE;
 
+    private Boolean aberto = Boolean.FALSE;
+
     @NotNull // adicionei porque o @PositiveOrZero não valida se é nulo
     @TaxaFrete
     @Column(name = "taxa_frete", nullable = false)
@@ -69,6 +71,12 @@ public class Restaurante {
             inverseJoinColumns = @JoinColumn(name = "forma_pagamento_id"))
     private Set<FormaDePagamento> formasPagamento = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(name = "restaurante_usuario_responsavel",
+            joinColumns = @JoinColumn(name = "restaurante_id"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_id"))
+    private Set<Usuario> responsaveis = new HashSet<>();
+
     @Embedded
     private Endereco endereco;
 
@@ -76,6 +84,12 @@ public class Restaurante {
     private List<Produto> produtos = new ArrayList<>();
 
 
+    public  void fechamento (){
+        setAberto(false);
+    }
+    public  void abertura (){
+        setAberto(true);
+    }
 
     public  void ativar (){
         setAtivo(true);
@@ -89,5 +103,13 @@ public class Restaurante {
     }
     public boolean associarNovaFormaPagamento(FormaDePagamento formaDePagamento) {
         return getFormasPagamento().add(formaDePagamento);
+    }
+
+    public boolean removerResponsavel(Usuario usuario) {
+        return getResponsaveis().remove(usuario);
+    }
+
+    public boolean adicionarResponsavel(Usuario usuario) {
+        return getResponsaveis().add(usuario);
     }
 }

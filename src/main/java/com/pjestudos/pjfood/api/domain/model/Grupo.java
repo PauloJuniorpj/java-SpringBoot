@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -28,9 +30,16 @@ public class Grupo {
     @ManyToMany
     @JoinTable(name = "grupo_permissao", joinColumns = @JoinColumn(name = "grupo_id"),
     inverseJoinColumns = @JoinColumn(name = "permissao_id"))
-    private List<Permissao> permissoes = new ArrayList<>();
+    private Set<Permissao> permissoes = new HashSet<>();
 
     public Grupo(GrupoDtoInput grupoDtoInput) {
         nome = grupoDtoInput.getNome();
+    }
+
+    public boolean associarUmaPermissao(Permissao permissao){
+        return getPermissoes().add(permissao);
+    }
+    public boolean desassociarPermissao (Permissao permissao){
+        return getPermissoes().remove(permissao);
     }
 }

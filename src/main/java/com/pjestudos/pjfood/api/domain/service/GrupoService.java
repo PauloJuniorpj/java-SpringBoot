@@ -22,6 +22,8 @@ public class GrupoService {
 
     @Autowired
     private GrupoRepository grupoRepository;
+    @Autowired
+    private PermissaoService permissaoService;
 
     @Transactional
     public Grupo salvar(Grupo grupo) {
@@ -42,5 +44,21 @@ public class GrupoService {
             throw new EntidadeEmUsoException(
                     String.format(MSG_GRUPO_EM_USO, grupoId));
         }
+    }
+
+    @Transactional
+    public void associarPermissao(Long grupoId, Long permissaoId) {
+        var grupo = buscarOuFalhar(grupoId);
+        var permissao = permissaoService.buscarOuTratar(permissaoId);
+
+        grupo.associarUmaPermissao(permissao);
+    }
+
+    @Transactional
+    public void desassociarPermissao(Long grupoId, Long permissaoId) {
+        var grupo = buscarOuFalhar(grupoId);
+        var permissao = permissaoService.buscarOuTratar(permissaoId);
+
+        grupo.desassociarPermissao(permissao);
     }
 }

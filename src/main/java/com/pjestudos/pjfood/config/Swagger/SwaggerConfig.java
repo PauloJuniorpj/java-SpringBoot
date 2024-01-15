@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
     public OpenAPI customAPI(){
-        return new OpenAPI().info(new Info().title("AlgaFood-API").version("1.0.0"));
+        return new OpenAPI().info(new Info().title("PJsFOOD-API").version("1.0.0"));
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

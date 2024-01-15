@@ -18,6 +18,7 @@ public class RestauranteDtoInput {
     private String nome;
     private BigDecimal taxaFrete;
     private Boolean ativo;
+    private Boolean aberto;
     private CozinhaDto cozinha;
 
     @Valid

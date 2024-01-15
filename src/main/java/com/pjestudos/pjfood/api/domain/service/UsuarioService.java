@@ -15,6 +15,9 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private GrupoService grupoService;
+
     @Transactional
     public Usuario salvar(Usuario usuario) {
         //RN EMAIL Apenas 1 por usuario;
@@ -45,5 +48,19 @@ public class UsuarioService {
     public Usuario buscarOuFalhar(Long usuarioId) {
         return usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(usuarioId));
+    }
+
+    @Transactional
+    public void associarGrupo(Long usuarioId, Long grupoId) {
+        var usuario = buscarOuFalhar(usuarioId);
+        var grupo = grupoService.buscarOuFalhar(grupoId);
+        usuario.adicionarGrupo(grupo);
+    }
+
+    @Transactional
+    public void desassociarGrupo(Long usuarioId, Long grupoId) {
+        var usuario = buscarOuFalhar(usuarioId);
+        var grupo = grupoService.buscarOuFalhar(grupoId);
+        usuario.removerGrupo(grupo);
     }
 }

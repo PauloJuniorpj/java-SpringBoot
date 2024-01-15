@@ -30,17 +30,19 @@ public class CidadeController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Operation(summary = "Listar", description = "Retorna todas as cozinhas")
+    @Operation(summary = "Listar", description = "Retorna todas as cidades")
     @GetMapping
     public List<CidadeDto> listar(){
         return toCollectionDto(cidadeRepository.findAll());
     }
 
+    @Operation(summary = "Buscar", description = "Retorna uma cidade especifica")
     @GetMapping("/{cidadeId}")
     public CidadeDto buscar(@PathVariable Long cidadeId) {
         return toDto(cidadeService.buscarOuExceptionTratada(cidadeId));
     }
 
+    @Operation(summary = "Adcionar", description = "Cadastrar nova cidade")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CidadeDto adicionar(@RequestBody  CidadeDto cidadeDto) {
@@ -52,6 +54,7 @@ public class CidadeController {
         }
     }
 
+    @Operation(summary = "Atualizar", description = "Atualizar nova cidade")
     @PutMapping("/{cidadeId}")
     public CidadeDto atualizar(@PathVariable  Long cidadeId,
                             @RequestBody CidadeDto cidade) {
@@ -65,6 +68,7 @@ public class CidadeController {
         }
     }
 
+    @Operation(summary = "Excluir", description = "Excluir uma cidade cadastrada")
     @DeleteMapping("/{cidadeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long cidadeId) {

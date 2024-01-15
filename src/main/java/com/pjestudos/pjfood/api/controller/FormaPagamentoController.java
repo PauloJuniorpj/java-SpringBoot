@@ -6,6 +6,7 @@ import com.pjestudos.pjfood.api.domain.model.Estado;
 import com.pjestudos.pjfood.api.domain.model.FormaDePagamento;
 import com.pjestudos.pjfood.api.domain.repository.FormaDePagamentoRepository;
 import com.pjestudos.pjfood.api.domain.service.FormaPagamentoService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,18 +29,21 @@ public class FormaPagamentoController {
     @Autowired
     private FormaPagamentoService service;
 
+    @Operation(summary = "Listar", description = "Listar as formas de pagamentos aceitas pelos restaurantes")
     @GetMapping
     public List<FormaPagamentoDto> listar() {
         List<FormaDePagamento> todasFormasPagamentos = formaDePagamentoRepository.findAll();
         return toCollectionDto(todasFormasPagamentos);
     }
 
+    @Operation(summary = "Buscar", description = "Buscar uma forma de pagamento especifica")
     @GetMapping("/{formaPagamentoId}")
     public FormaPagamentoDto buscar(@PathVariable Long formaPagamentoId) {
 
         return toDto(service.buscarOuFalhar(formaPagamentoId));
     }
 
+    @Operation(summary = "Cadastrar", description = "Cadastrar uma nova forma de pagamento")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public FormaPagamentoDto adicionar(@RequestBody @Valid FormaPagamentoDto formaPagamentoDto) {
@@ -47,6 +51,7 @@ public class FormaPagamentoController {
         return toDto(service.salvar(formaPagamento));
     }
 
+    @Operation(summary = "Atualizar", description = "Atualizar uma forma de pagamento cadastrada")
     @PutMapping("/{formaPagamentoId}")
     public FormaPagamentoDto atualizar(@PathVariable Long formaPagamentoId,
                                          @RequestBody @Valid FormaPagamentoDto formaPagamentoDto) {
@@ -56,6 +61,7 @@ public class FormaPagamentoController {
         return toDto(service.salvar(formaPagamentoAtual));
     }
 
+    @Operation(summary = "Excluir", description = "Exclusao de uma forma de pagamento cadastrada")
     @DeleteMapping("/{formaPagamentoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long formaPagamentoId) {

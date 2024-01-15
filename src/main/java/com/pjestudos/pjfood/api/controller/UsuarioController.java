@@ -10,6 +10,7 @@ import com.pjestudos.pjfood.api.domain.model.Grupo;
 import com.pjestudos.pjfood.api.domain.model.Usuario;
 import com.pjestudos.pjfood.api.domain.repository.UsuarioRepository;
 import com.pjestudos.pjfood.api.domain.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,18 +33,21 @@ public class UsuarioController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Operation(summary = "Listar", description = "Listar todos os usuários")
     @GetMapping("/listar")
     public List<UsuarioDto> listar() {
         List<Usuario> todasUsuarios = usuarioRepository.findAll();
         return toCollectionDto(todasUsuarios);
     }
 
+    @Operation(summary = "Buscar", description = "Buscar um usuário ")
     @GetMapping("/buscar/{usuarioId}")
     public UsuarioDto buscar(@PathVariable Long usuarioId) {
         Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
         return toDto(usuario);
     }
 
+    @Operation(summary = "Cadastrar", description = "Cadastrar novo usuário")
     @PostMapping("/cadastrar")
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioInput adicionar(@RequestBody @Valid UsuarioComSenhaInput usuarioInput) {
@@ -52,6 +56,7 @@ public class UsuarioController {
         return toDtoInput(usuario);
     }
 
+    @Operation(summary = "Atualizar", description = "Atualizar um usuário")
     @PutMapping("/atualizar/{usuarioId}")
     public UsuarioInput atualizar(@PathVariable Long usuarioId,
                                   @RequestBody @Valid UsuarioInput usuarioInput) {
@@ -61,6 +66,7 @@ public class UsuarioController {
         return toDtoInput(usuarioAtual);
     }
 
+    @Operation(summary = "Alterar Senha", description = "Alterar senha do usuário")
     @PutMapping("/{usuarioId}/senha")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void alterarSenha(@PathVariable Long usuarioId, @RequestBody @Valid SenhaInput senha) {

@@ -8,10 +8,12 @@ import com.pjestudos.pjfood.api.domain.dto.Restaurante.RestauranteDtoInput;
 import com.pjestudos.pjfood.api.domain.exception.CidadeNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.CozinhaNaoEncontradaException;
 import com.pjestudos.pjfood.api.domain.exception.NegocioException;
+import com.pjestudos.pjfood.api.domain.exception.RestauranteNaoEncontradoException;
 import com.pjestudos.pjfood.api.domain.model.Restaurante;
 import com.pjestudos.pjfood.api.domain.repository.RestauranteRepository;
 import com.pjestudos.pjfood.api.domain.service.RestauranteService;
 import com.pjestudos.pjfood.config.core.modelmapper.modelmapperConversonsUtils.RestauranteModelMapperConversons;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -41,12 +43,14 @@ public class RestauranteController {
         this.mapperConversons = mapperConversons;
     }
 
-
+    @Operation(summary = "Listar", description = "Listar todos os restaurante")
     @GetMapping
     public List<RestauranteDto> listar(){
         return mapperConversons.toCollectionDto(restauranteRepository.findAll());
     }
 
+
+    @Operation(summary = "Buscar", description = "Buscar um restaurante ")
     @GetMapping("/{restaurantesId}")
     public RestauranteDto buscar(@PathVariable("restaurantesId") Long id){
         Restaurante restaurante = restauranteService.buscarOuTratar(id);
@@ -54,6 +58,7 @@ public class RestauranteController {
 
     }
 
+    @Operation(summary = "Cadastrar", description = "Cadastra novo restaurante")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RestauranteDtoInput adicionar(@RequestBody @Valid RestauranteDtoInput restauranteDto){
@@ -65,6 +70,7 @@ public class RestauranteController {
         }
     }
 
+    @Operation(summary = "Atualizar", description = "Atualizar um restaurante especifico")
     @PutMapping("/{restaurantesId}")
     public RestauranteDtoInput atualizar(@PathVariable("restaurantesId") Long id,
                                                 @Valid @RequestBody RestauranteDtoInput restauranteDto) {
@@ -77,6 +83,7 @@ public class RestauranteController {
                 }
     }
 
+    @Operation(summary = "Excluir", description = "Excluir um restaurante especifico")
     @DeleteMapping("/{restaurantesId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void remover
@@ -85,18 +92,55 @@ public class RestauranteController {
         restauranteService.excluir(id);
     }
 
+    @Operation(summary = "Ativar" , description = "Ativar Restaurante")
     @PutMapping("/{id}/ativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void ativar(@PathVariable Long id){
         restauranteService.ativar(id);
     }
 
+    @Operation(summary = "Ativar Varios" , description = "Ativar mais de um Restaurante")
+    @PutMapping("/ativacoes")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void ativarVarios(@RequestBody List<Long> restauranteIds){
+        try {
+            restauranteService.ativarVarios(restauranteIds);
+        }catch (RestauranteNaoEncontradoException e){
+            throw new NegocioException(e.getMessage(), e);
+        }
+    }
+
+    @Operation(summary = "Inativar", description = "Inativar Restaurante")
     @DeleteMapping("/{id}/inativo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void inativar(@PathVariable Long id){
         restauranteService.inativar(id);
     }
 
+    @Operation(summary = "Inativar Varios" , description = "Inativar mais de um Restaurante")
+    @DeleteMapping("/inativacoes")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void inativarVarios(@RequestBody List<Long> restauranteIds){
+        try {
+            restauranteService.inativarVarios(restauranteIds);
+        }catch (RestauranteNaoEncontradoException e){
+            throw new NegocioException(e.getMessage(), e);
+        }
+    }
+
+    @Operation(summary = "Aberto" , description = "Abertura de restaurante")
+    @PutMapping("/{id}/aberto")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void abertura(@PathVariable Long id){
+        restauranteService.aberto(id);
+    }
+
+    @Operation(summary = "Fechamento" , description = "Fechamento do restaurante")
+    @PutMapping("/{id}/fechamento")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void fechamento(@PathVariable Long id){
+        restauranteService.fechamento(id);
+    }
 
 
 }

@@ -10,6 +10,7 @@ import com.pjestudos.pjfood.api.domain.model.Usuario;
 import com.pjestudos.pjfood.api.domain.repository.ProdutoRepository;
 import com.pjestudos.pjfood.api.domain.service.ProdutoService;
 import com.pjestudos.pjfood.api.domain.service.RestauranteService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,17 +32,20 @@ public class ProdutoController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Operation(summary = "Listar", description = "Listar produtos do restaurante")
     @GetMapping
     public List<ProdutoDto> listar(@PathVariable Long restauranteId) {
         var restaurante = restauranteService.buscarOuTratar(restauranteId);
         return toCollectionDto(restaurante.getProdutos());
     }
 
+    @Operation(summary = "Buscar", description = "Buscar produto especifico")
     @GetMapping("/{produtoId}")
     public ProdutoDto buscar(@PathVariable Long restauranteId, @PathVariable Long produtoId) {
         Produto produto = service.buscarOuFalhar(restauranteId, produtoId);
         return toDto(produto);
     }
+    @Operation(summary = "Cadastrar", description = "Cadastrar novo produto ")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProdutoDto adicionar(@PathVariable Long restauranteId,
@@ -53,6 +57,7 @@ public class ProdutoController {
         return toDto(produto);
     }
 
+    @Operation(summary = "Atualizar", description = "Atualizar um produto ja cadastrado")
     @PutMapping("/{produtoId}")
     public ProdutoDto atualizar(@PathVariable Long restauranteId, @PathVariable Long produtoId,
                                   @RequestBody @Valid ProdutoInput produtoInput) {
@@ -61,6 +66,7 @@ public class ProdutoController {
         produtoAtual = service.salvar(produtoAtual);
         return toDto(produtoAtual);
     }
+
     //Visualização
     private ProdutoDto toDto(Produto produto){
         return modelMapper.map(produto, ProdutoDto.class);
