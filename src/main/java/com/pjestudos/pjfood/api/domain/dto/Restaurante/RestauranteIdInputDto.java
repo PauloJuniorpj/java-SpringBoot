@@ -10,4 +10,5 @@ import javax.validation.constraints.NotNull;
 public class RestauranteIdInputDto {
     @NotNull
     private Long id;
+    private String nome;
 }

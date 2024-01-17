@@ -1,7 +1,9 @@
 package com.pjestudos.pjfood.config.core.modelmapper;
 
 import com.pjestudos.pjfood.api.domain.dto.Endereco.EnderecoDto;
+import com.pjestudos.pjfood.api.domain.dto.ItemPedido.ItemPedidoInputDto;
 import com.pjestudos.pjfood.api.domain.model.Endereco;
+import com.pjestudos.pjfood.api.domain.model.ItemPedido;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +23,10 @@ public class ModelMapperConfing {
                 org -> org.getCidade().getEstado().getNome(),
                 (dest, value) -> dest.getCidade().setEstado(value)
         );
+
+        modelMapper.createTypeMap(ItemPedidoInputDto.class, ItemPedido.class)
+                .addMappings(mapper -> mapper.skip(ItemPedido::setId));
+
         return modelMapper;
     }
 }
