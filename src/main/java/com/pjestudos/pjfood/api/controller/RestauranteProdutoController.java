@@ -1,19 +1,28 @@
 package com.pjestudos.pjfood.api.controller;
 
+import com.pjestudos.pjfood.api.domain.dto.Produto.FotoProduto.FotoProdutoDto;
+import com.pjestudos.pjfood.api.domain.dto.Produto.FotoProduto.FotoProdutoDtoInput;
 import com.pjestudos.pjfood.api.domain.dto.Produto.ProdutoDto;
 import com.pjestudos.pjfood.api.domain.dto.Produto.ProdutoInput;
+import com.pjestudos.pjfood.api.domain.model.FotoProduto;
 import com.pjestudos.pjfood.api.domain.model.Produto;
 import com.pjestudos.pjfood.api.domain.repository.ProdutoRepository;
+import com.pjestudos.pjfood.api.domain.service.CatalogoFotoProdutoService;
 import com.pjestudos.pjfood.api.domain.service.ProdutoService;
 import com.pjestudos.pjfood.api.domain.service.RestauranteService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,6 +37,9 @@ public class RestauranteProdutoController {
     private ProdutoRepository produtoRepository;
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private CatalogoFotoProdutoService catalogoFotoProdutoService;
 
     @Operation(summary = "Listar", description = "Listar produtos do restaurante")
     @GetMapping
@@ -70,6 +82,26 @@ public class RestauranteProdutoController {
         return toDto(produtoAtual);
     }
 
+    @Operation(summary = "Atualizar Foto do Produto", description = "Atualizar a foto vinculada ao Produto")
+    @PutMapping(path = "/{produtoiD}/foto-produto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public FotoProdutoDto atualizarFoto(@PathVariable Long restauranteId, @PathVariable Long produtoiD,
+                                        @Valid FotoProdutoDtoInput fotoProdutoDtoInput) throws IOException {
+
+        var produto = service.buscarOuFalhar(restauranteId, produtoiD);
+        var arquivo = fotoProdutoDtoInput.getArquivo();
+
+        var fotoProduto = new FotoProduto();
+        fotoProduto.setProduto(produto);
+        fotoProduto.setDescricao(fotoProdutoDtoInput.getDescricao());
+        fotoProduto.setContentType(arquivo.getContentType());
+        fotoProduto.setTamanho(arquivo.getSize());
+        fotoProduto.setNomeArquivo(arquivo.getOriginalFilename());
+
+        var fotoSalva = catalogoFotoProdutoService.salvar(fotoProduto, arquivo.getInputStream());
+        return toDtoFotoProduto(fotoSalva);
+    }
+
+
     //Visualização
     private ProdutoDto toDto(Produto produto){
         return modelMapper.map(produto, ProdutoDto.class);
@@ -84,5 +116,10 @@ public class RestauranteProdutoController {
     }
     private void copyToDomainObject(ProdutoInput produtoInput, Produto produto){
         modelMapper.map(produtoInput, produto);
+    }
+
+    //Foto do Produto
+    private FotoProdutoDto toDtoFotoProduto(FotoProduto fotoProduto){
+        return modelMapper.map(fotoProduto, FotoProdutoDto.class);
     }
 }

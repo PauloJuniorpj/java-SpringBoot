@@ -1,0 +1,29 @@
+package com.pjestudos.pjfood.infrasctructure.storage.spec;
+
+import com.pjestudos.pjfood.api.domain.service.FotoStorageService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+@Service
+public class LocalFotoStorageService implements FotoStorageService {
+
+    @Value("{$pjfood.storage.local.diretorio-fotos}")
+    private Path diretoriosFotos;
+    @Override
+    public void armazenar(NovaFoto novaFoto) {
+        try {
+            Path arquivoPath = getAqruivoPath(novaFoto.getNomeArquivo());
+            FileCopyUtils.copy(novaFoto.getInputStream(), Files.newOutputStream(arquivoPath));
+        } catch (Exception e) {
+            throw new StoregeException("Não foi possível armazenar arquivo.", e);
+        }
+    }
+    private Path getAqruivoPath(String nomeArquivo){
+        return diretoriosFotos.relativize(Path.of(nomeArquivo));
+    }
+}
