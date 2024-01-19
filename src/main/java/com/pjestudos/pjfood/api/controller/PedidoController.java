@@ -1,5 +1,7 @@
 package com.pjestudos.pjfood.api.controller;
 
+import com.pjestudos.pjfood.api.domain.dto.Cozinha.CozinhaDto;
+import com.pjestudos.pjfood.api.domain.dto.Pedido.Filter.PedidoDtoFilter;
 import com.pjestudos.pjfood.api.domain.dto.Pedido.PedidoDto;
 import com.pjestudos.pjfood.api.domain.dto.Pedido.PedidoInputDto;
 import com.pjestudos.pjfood.api.domain.dto.Pedido.PedidoResmumoDto;
@@ -11,14 +13,21 @@ import com.pjestudos.pjfood.api.domain.model.Restaurante;
 import com.pjestudos.pjfood.api.domain.model.Usuario;
 import com.pjestudos.pjfood.api.domain.repository.PedidoRepository;
 import com.pjestudos.pjfood.api.domain.service.PedidoService;
+import com.pjestudos.pjfood.config.core.data.PageableTranslete;
+import com.pjestudos.pjfood.infrasctructure.repository.spec.PedidoSpecs;
 import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -40,10 +49,21 @@ public class PedidoController {
         return toCollectionDtoPedidoResumo(todosPedidos);
     }
 
+    //Pesquisa Filstrada ultilizaando o methodo Specification do JPA
+    @Operation(summary = "Pesquisar", description = "Listar pedidos filtrado")
+    @GetMapping("/pesquisar")
+    public Page<PedidoResmumoDto> pesquisaFiltrada(PedidoDtoFilter filter, @PageableDefault(size = 5) Pageable pageable) {
+        pageable = traduzirPageable(pageable);
+        var todosPedidos = pedidoRepository.findAll(PedidoSpecs.usandoFiltro(filter), pageable);
+        var pedidosList = toCollectionDtoPedidoResumo(todosPedidos.getContent());
+        Page<PedidoResmumoDto> pedidosPaginado = new PageImpl<>(pedidosList, pageable, todosPedidos.getTotalElements());
+        return  pedidosPaginado;
+    }
+
     @Operation(summary = "Buscar", description = "buscar um pedido")
-    @GetMapping("/{pedidoId}")
-    public PedidoDto buscar(@PathVariable Long pedidoId) {
-        var pedido = pedidoService.buscarOuFalhar(pedidoId);
+    @GetMapping("/{codigoPedido}")
+    public PedidoDto buscar(@PathVariable String codigoPedido) {
+        var pedido = pedidoService.buscarOuFalhar(codigoPedido);
 
         return toDto(pedido);
     }
@@ -82,5 +102,16 @@ public class PedidoController {
     }
     public void copyToDomainObject(PedidoInputDto pedidoInput, Pedido pedido) {
         modelMapper.map(pedidoInput, pedido);
+    }
+
+    //Mapeamento do nossa ordenação
+    private Pageable traduzirPageable(Pageable apiPageable){
+        var mapeamento = Map.of(
+                "codigo","codigo",
+                "restaurante.nome", "restaurante.nome",
+                "nomeCliente", "cliente.nome",
+                "valorTotal", "valorTotal"
+        );
+        return PageableTranslete.translate(apiPageable, mapeamento);
     }
 }

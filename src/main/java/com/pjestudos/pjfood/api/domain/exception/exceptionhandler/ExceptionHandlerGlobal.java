@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -34,9 +35,19 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ExceptionHandlerGlobal extends ResponseEntityExceptionHandler {
 
+    public static final String MSG_ERRO_GENERICA_USUARIO_FINAL
+            = "Ocorreu um erro interno inesperado no sistema. Tente novamente e se "
+            + "o problema persistir, entre em contato com o administrador do sistema.";
+
     @Autowired
     private MessageSource messageSource;
 
+    @Override
+    protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status,
+                                                         WebRequest request) {
+
+        return handleValidationInternal(ex, ex.getBindingResult(), headers, status, request);
+    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -132,12 +143,14 @@ public class ExceptionHandlerGlobal extends ResponseEntityExceptionHandler {
                     .status(httpStatus.value())
                     .timesTamp(LocalDateTime.parse(LocalDateTime.now()
                             .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                    .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                     .title(httpStatus.getReasonPhrase()).build();
         } else if(body instanceof String){
             body = Problema.builder()
                     .timesTamp(LocalDateTime.parse(LocalDateTime.now()
                             .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                     .status(httpStatus.value())
+                    .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                     .title((String) body).build();
 
         }
@@ -213,7 +226,6 @@ public class ExceptionHandlerGlobal extends ResponseEntityExceptionHandler {
 
         ProblemaTipo problemType = ProblemaTipo.DADOS_INVALIDOS;
         String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
-
         List<Problema.ErrosTratar>tratarList = bindingResult.getAllErrors().stream()
                 .map(objectError -> {
                     String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
@@ -226,7 +238,7 @@ public class ExceptionHandlerGlobal extends ResponseEntityExceptionHandler {
 
                     return Problema.ErrosTratar.builder()
                             .name(name)
-                            .userMessage(message)
+                            .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
                             .build();
                 })
                 .collect(Collectors.toList());

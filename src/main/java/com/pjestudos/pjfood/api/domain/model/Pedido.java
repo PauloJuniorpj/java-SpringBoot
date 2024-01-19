@@ -11,8 +11,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -25,26 +27,26 @@ public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String codigo;
     private BigDecimal subtotal;
     private BigDecimal taxaFrete;
     private BigDecimal valorTotal;
 
     @CreationTimestamp
-    private LocalDateTime dataCriacao;
-    private LocalDateTime dataEntrega;
-    private LocalDateTime dataConfirmacao;
-    private LocalDateTime dataCancelamento;
+    private OffsetDateTime dataCriacao;
+    private OffsetDateTime dataEntrega;
+    private OffsetDateTime dataConfirmacao;
+    private OffsetDateTime dataCancelamento;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "forma_pagamento_id", nullable = false)
     private FormaDePagamento formaDePagamento;
 
     @Enumerated(EnumType.STRING)
     private StatusPedido status = StatusPedido.CRIADO;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "restaurante_id",nullable = false)
     private Restaurante restaurante;
 
     @ManyToOne
@@ -68,24 +70,31 @@ public class Pedido {
         this.valorTotal = this.subtotal.add(this.taxaFrete);
     }
 
+    //Gerar o UUID
+    //methodo de callback do JPA ele vai executar antes de eu persistir um novo dado
+    @PrePersist
+    private void gerarUUID(){
+        setCodigo(UUID.randomUUID().toString());
+    }
+
     //RN Mudando Status do Pedido
     public void confirmar(){
         setStatus(StatusPedido.CONFIRMADO);
-        setDataConfirmacao(LocalDateTime.now());
+        setDataConfirmacao(OffsetDateTime.now());
     }
     public void entregar(){
         setStatus(StatusPedido.ENTREGUE);
-        setDataEntrega(LocalDateTime.now());
+        setDataEntrega(OffsetDateTime.now());
     }
     public void cancelar(){
         setStatus(StatusPedido.CANCELADO);
-        setDataCancelamento(LocalDateTime.now());
+        setDataCancelamento(OffsetDateTime.now());
     }
 
     private void setStatus(StatusPedido novoStatus){
         if(getStatus().naoPodeAlterarPara(novoStatus)){
             throw new NegocioException(String.format("Status do pedido %d não pode ser alterado de %s para %s",
-                    getId(), getStatus().getDescricao(), novoStatus.getDescricao()));
+                    getCodigo(), getStatus().getDescricao(), novoStatus.getDescricao()));
         }
         this.status = novoStatus;
     }

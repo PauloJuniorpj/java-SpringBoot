@@ -7,6 +7,9 @@ import com.pjestudos.pjfood.api.domain.service.CozinhaService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +34,15 @@ public class CozinhaController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CozinhaDto> listar(){
         return toCollectionDto(cozinhaRepository.findAll());
+    }
+
+    @Operation(summary = "Paginação simples", description = "Listar todas as cozinhas com paginação")
+    @GetMapping("/paginação")
+    public Page<CozinhaDto> listarPaginada(Pageable pageable){
+        Page<Cozinha> cozinhas = cozinhaRepository.findAll(pageable);
+        List<CozinhaDto> cozinhaDtos = toCollectionDto(cozinhas.getContent());
+        Page<CozinhaDto> cozinhaDtoPage = new PageImpl<>(cozinhaDtos, pageable, cozinhas.getTotalElements());
+        return  cozinhaDtoPage;
     }
 
     @Operation(summary = "Buscar", description = "Buscar uma cozinha especifica")

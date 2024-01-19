@@ -1,12 +1,8 @@
 package com.pjestudos.pjfood.api.controller;
 
-import com.pjestudos.pjfood.api.domain.dto.FormaPagamento.FormaPagamentoDto;
 import com.pjestudos.pjfood.api.domain.dto.Produto.ProdutoDto;
 import com.pjestudos.pjfood.api.domain.dto.Produto.ProdutoInput;
-import com.pjestudos.pjfood.api.domain.dto.Usuario.UsuarioInput;
-import com.pjestudos.pjfood.api.domain.model.FormaDePagamento;
 import com.pjestudos.pjfood.api.domain.model.Produto;
-import com.pjestudos.pjfood.api.domain.model.Usuario;
 import com.pjestudos.pjfood.api.domain.repository.ProdutoRepository;
 import com.pjestudos.pjfood.api.domain.service.ProdutoService;
 import com.pjestudos.pjfood.api.domain.service.RestauranteService;
@@ -17,26 +13,33 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/restaurantes/{restauranteId}/produtos")
-public class ProdutoController {
+public class RestauranteProdutoController {
 
     @Autowired
     private RestauranteService restauranteService;
     @Autowired
     private ProdutoService service;
     @Autowired
+    private ProdutoRepository produtoRepository;
+    @Autowired
     private ModelMapper modelMapper;
 
     @Operation(summary = "Listar", description = "Listar produtos do restaurante")
     @GetMapping
-    public List<ProdutoDto> listar(@PathVariable Long restauranteId) {
+    public List<ProdutoDto> listar(@PathVariable Long restauranteId, @RequestParam(required = false) boolean incluirInativos) {
         var restaurante = restauranteService.buscarOuTratar(restauranteId);
-        return toCollectionDto(restaurante.getProdutos());
+        List<Produto> produtosRestaurante;
+        if(incluirInativos){
+            produtosRestaurante = produtoRepository.findByRestaurante(restaurante);
+        }else{
+           produtosRestaurante = produtoRepository.findAtivosByRestaurante(restaurante);
+        }
+        return toCollectionDto(produtosRestaurante);
     }
 
     @Operation(summary = "Buscar", description = "Buscar produto especifico")

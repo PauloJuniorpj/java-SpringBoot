@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FormaPagamentoDto {
+
     private Long id;
     @NotBlank
     private String descricao;
