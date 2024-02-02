@@ -1,7 +1,7 @@
 package com.pjestudos.pjfood.api.domain.service;
 
-import com.pjestudos.pjfood.api.domain.exception.NegocioException;
-import com.pjestudos.pjfood.api.domain.model.StatusPedido;
+
+import com.pjestudos.pjfood.api.domain.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +15,15 @@ public class FluxoPedidoService {
     @Autowired
     private PedidoService pedidoService;
 
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
     @Transactional
     public void confirmar(String codigoPedido){
         var pedido = pedidoService.buscarOuFalhar(codigoPedido);
         pedido.confirmar();
+
+        pedidoRepository.save(pedido);
     }
 
     @Transactional
@@ -30,5 +35,7 @@ public class FluxoPedidoService {
     public void cancelar(String codigoPedido) {
        var pedido = pedidoService.buscarOuFalhar(codigoPedido);
         pedido.cancelar();
+
+        pedidoRepository.save(pedido);
     }
 }

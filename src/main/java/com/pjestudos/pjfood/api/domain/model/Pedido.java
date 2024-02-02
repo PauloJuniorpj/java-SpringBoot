@@ -1,12 +1,14 @@
 package com.pjestudos.pjfood.api.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pjestudos.pjfood.api.domain.Event.PedidoEvent;
 import com.pjestudos.pjfood.api.domain.exception.NegocioException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -17,11 +19,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Pedido {
+public class Pedido extends AbstractAggregateRoot<Pedido> {
 
     @EqualsAndHashCode.Include
     @Id
@@ -81,6 +83,9 @@ public class Pedido {
     public void confirmar(){
         setStatus(StatusPedido.CONFIRMADO);
         setDataConfirmacao(OffsetDateTime.now());
+
+        //Evento de Dominio
+        registerEvent(new PedidoEvent(this));
     }
     public void entregar(){
         setStatus(StatusPedido.ENTREGUE);
@@ -89,11 +94,13 @@ public class Pedido {
     public void cancelar(){
         setStatus(StatusPedido.CANCELADO);
         setDataCancelamento(OffsetDateTime.now());
+
+        registerEvent(new PedidoEvent(this));
     }
 
     private void setStatus(StatusPedido novoStatus){
         if(getStatus().naoPodeAlterarPara(novoStatus)){
-            throw new NegocioException(String.format("Status do pedido %d não pode ser alterado de %s para %s",
+            throw new NegocioException(String.format("Status do pedido %s não pode ser alterado de %s para %s",
                     getCodigo(), getStatus().getDescricao(), novoStatus.getDescricao()));
         }
         this.status = novoStatus;

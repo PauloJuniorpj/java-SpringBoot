@@ -1,6 +1,8 @@
 package com.pjestudos.pjfood.infrasctructure.storage.spec;
 
 import com.pjestudos.pjfood.api.domain.service.FotoStorageService;
+import com.pjestudos.pjfood.config.core.Storage.StorageProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
@@ -15,6 +17,12 @@ public class LocalFotoStorageService implements FotoStorageService {
 
     @Value("{$pjfood.storage.local.diretorio-fotos}")
     private Path diretoriosFotos;
+
+    /* @Autowired
+    private StorageProperties storageProperties;
+
+     */
+
     @Override
     public void armazenar(NovaFoto novaFoto) {
         try {
